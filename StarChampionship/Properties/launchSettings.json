@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "StarChampionship": {
+    "PublicTeamManagement": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

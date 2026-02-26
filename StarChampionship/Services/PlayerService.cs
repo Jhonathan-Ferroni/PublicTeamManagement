@@ -1,71 +1,83 @@
-﻿using StarChampionship.Data;
-using StarChampionship.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using StarChampionship.Services.Exceptions;
+﻿using System.Globalization;
+using CsvHelper;
+using PublicTeamManagement.Models;
 
-namespace StarChampionship.Services
+namespace PublicTeamManagement.Services
 {
     public class PlayerService
     {
-        private readonly StarChampionshipContext _context;
+        private readonly string _filePath;
 
-        public PlayerService(StarChampionshipContext context)
+        public PlayerService(IWebHostEnvironment env)
         {
-            _context = context;
-        }
+            // Define o caminho na pasta wwwroot/data/players.csv
+            _filePath = Path.Combine(env.WebRootPath, "data", "players.csv");
 
-        public async Task<List<Player>> FindAllAsync()
-        {
-            // Removido qualquer referência a Department
-            return await _context.Player.ToListAsync();
-        }
+            // Cria a pasta e o arquivo caso não existam
+            var directory = Path.GetDirectoryName(_filePath);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory!);
 
-        public async Task InsertAsync(Player obj)
-        {
-            _context.Add(obj);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task<Player> FindByIdAsync(int id)
-        {
-            // Removido o .Include(obj => obj.Department) pois a propriedade não existe mais
-            return await _context.Player.FirstOrDefaultAsync(obj => obj.Id == id);
-        }
-
-        public async Task RemoveAsync(int id)
-        {
-            try
+            // Se o arquivo não existir, cria um vazio com o cabeçalho para evitar erros de leitura
+            if (!File.Exists(_filePath))
             {
-                var obj = await _context.Player.FindAsync(id);
-                if (obj != null)
-                {
-                    _context.Player.Remove(obj);
-                    await _context.SaveChangesAsync();
-                }
-            }
-            catch (DbUpdateException e)
-            {
-                throw new IntegrityException(e.Message);
+                SaveAll(new List<Player>());
             }
         }
 
-        public async Task UpdateAsync(Player obj)
+        // Retorna o caminho para o Controller usar no Download
+        public string GetFilePath() => _filePath;
+
+        public List<Player> GetAll()
         {
-            bool hasAny = await _context.Player.AnyAsync(x => x.Id == obj.Id);
-            if (!hasAny)
+            if (!File.Exists(_filePath)) return new List<Player>();
+
+            using var reader = new StreamReader(_filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+            return csv.GetRecords<Player>().ToList();
+        }
+
+        public void SaveAll(List<Player> players)
+        {
+            using var writer = new StreamWriter(_filePath);
+            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+            csv.WriteRecords(players);
+        }
+
+        public void AddPlayer(Player player)
+        {
+            var players = GetAll();
+            // Lógica simples para gerar ID incremental
+            player.Id = players.Any() ? players.Max(p => p.Id) + 1 : 1;
+            players.Add(player);
+            SaveAll(players);
+        }
+
+        public Player? FindById(int id)
+        {
+            return GetAll().FirstOrDefault(p => p.Id == id);
+        }
+
+        public void Update(Player obj)
+        {
+            var players = GetAll();
+            var index = players.FindIndex(p => p.Id == obj.Id);
+
+            if (index != -1)
             {
-                throw new NotFoundException("ID not found");
+                players[index] = obj;
+                SaveAll(players);
             }
-            try
+        }
+
+        public void Remove(int id)
+        {
+            var players = GetAll();
+            var player = players.FirstOrDefault(p => p.Id == id);
+
+            if (player != null)
             {
-                _context.Update(obj);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException e)
-            {
-                throw new DbConcurrencyException(e.Message);
+                players.Remove(player);
+                SaveAll(players);
             }
         }
     }

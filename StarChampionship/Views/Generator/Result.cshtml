@@ -1,8 +1,8 @@
-﻿@model System.Collections.Generic.IEnumerable<StarChampionship.Models.Player>
+﻿@model System.Collections.Generic.IEnumerable<PublicTeamManagement.Models.Player>
 
 @{
     ViewData["Title"] = "Gerador de Times";
-    var teams = ViewBag.Teams as System.Collections.Generic.List<StarChampionship.Models.Team> ?? new System.Collections.Generic.List<StarChampionship.Models.Team>();
+    var teams = ViewBag.Teams as System.Collections.Generic.List<PublicTeamManagement.Models.Team> ?? new System.Collections.Generic.List<PublicTeamManagement.Models.Team>();
     var selectedIdsRaw = ViewBag.SelectedIds as int[];
     var selectedCount = selectedIdsRaw?.Length ?? 0;
     var numberOfTeams = ViewBag.NumberOfTeams is int n ? n : 2;

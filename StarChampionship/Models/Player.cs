@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace StarChampionship.Models
+namespace PublicTeamManagement.Models
 {
     public class Player
     {

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using StarChampionship.Models.ViewModels;
+using PublicTeamManagement.Models.ViewModels;
 
-namespace StarChampionship.Controllers
+namespace PublicTeamManagement.Controllers
 {
     public class HomeController : Controller
     {

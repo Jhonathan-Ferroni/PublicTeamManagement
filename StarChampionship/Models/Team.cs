@@ -1,4 +1,4 @@
-﻿namespace StarChampionship.Models
+﻿namespace PublicTeamManagement.Models
 {
     public class Team
     {

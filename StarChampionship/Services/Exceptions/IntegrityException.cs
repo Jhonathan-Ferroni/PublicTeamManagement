@@ -1,4 +1,4 @@
-﻿namespace StarChampionship.Services.Exceptions
+﻿namespace PublicTeamManagement.Services.Exceptions
 {
     public class IntegrityException : ApplicationException
     {

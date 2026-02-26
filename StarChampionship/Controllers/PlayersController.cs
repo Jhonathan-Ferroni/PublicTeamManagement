@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StarChampionship.Services;
-using StarChampionship.Models;
-using StarChampionship.Models.ViewModels;
-using StarChampionship.Services.Exceptions;
+using PublicTeamManagement.Services;
+using PublicTeamManagement.Models;
+using PublicTeamManagement.Models.ViewModels;
 using System.Diagnostics;
+using System.Globalization;
+using CsvHelper;
 
-namespace StarChampionship.Controllers
+namespace PublicTeamManagement.Controllers
 {
     public class PlayersController : Controller
     {
-        // Renomeado para seguir o padrão de nomenclatura da sua nova classe
         private readonly PlayerService _playerService;
 
         public PlayersController(PlayerService playerService)
@@ -17,115 +17,106 @@ namespace StarChampionship.Controllers
             _playerService = playerService;
         }
 
-        public async Task<IActionResult> Index()
+        // Listagem principal
+        public IActionResult Index()
         {
-            var list = await _playerService.FindAllAsync();
+            var list = _playerService.GetAll();
             return View(list);
         }
 
         public IActionResult Create()
         {
-            // Sem departamentos, não precisamos de ViewModel, apenas um Player vazio
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Player player)
+        public IActionResult Create(Player player)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(player);
-            }
+            if (!ModelState.IsValid) return View(player);
 
-            await _playerService.InsertAsync(player);
+            _playerService.AddPlayer(player);
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
-            }
-
-            var obj = await _playerService.FindByIdAsync(id.Value);
-
-            if (obj == null)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id not found" });
-            }
-            return View(obj);
-        }
-
+        // Carregar arquivo CSV do computador do usuário
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Upload(IFormFile file)
         {
-            try
+            if (file != null && file.Length > 0)
             {
-                await _playerService.RemoveAsync(id);
-                return RedirectToAction(nameof(Index));
+                using var reader = new StreamReader(file.OpenReadStream());
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+                // Lê os registros do arquivo enviado
+                var players = csv.GetRecords<Player>().ToList();
+
+                // Salva no nosso "banco" local (players.csv na wwwroot)
+                _playerService.SaveAll(players);
             }
-            catch (IntegrityException e)
-            {
-                return RedirectToAction(nameof(Error), new { message = e.Message });
-            }
+            return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Details(int? id)
+        // Baixar o arquivo CSV atual
+        public IActionResult Download()
         {
-            if (id == null)
+            var filePath = _playerService.GetFilePath();
+            if (!System.IO.File.Exists(filePath))
             {
-                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
+                return RedirectToAction(nameof(Error), new { message = "Arquivo não encontrado para download." });
             }
-            var obj = await _playerService.FindByIdAsync(id.Value);
-            if (obj == null)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id not found" });
-            }
+
+            var bytes = System.IO.File.ReadAllBytes(filePath);
+            return File(bytes, "text/csv", "PublicTeamManagement_Players.csv");
+        }
+
+        public IActionResult Details(int? id)
+        {
+            if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
+
+            var obj = _playerService.FindById(id.Value);
+            if (obj == null) return RedirectToAction(nameof(Error), new { message = "Id not found" });
+
             return View(obj);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
-            if (id == null)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id not provided" });
-            }
-            var obj = await _playerService.FindByIdAsync(id.Value);
-            if (obj == null)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id not found" });
-            }
+            if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
+
+            var obj = _playerService.FindById(id.Value);
+            if (obj == null) return RedirectToAction(nameof(Error), new { message = "Id not found" });
 
             return View(obj);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Player player)
+        public IActionResult Edit(int id, Player player)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(player);
-            }
+            if (!ModelState.IsValid) return View(player);
+            if (id != player.Id) return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
 
-            if (id != player.Id)
-            {
-                return RedirectToAction(nameof(Error), new { message = "Id mismatch" });
-            }
+            _playerService.Update(player);
+            return RedirectToAction(nameof(Index));
+        }
 
-            try
-            {
-                await _playerService.UpdateAsync(player);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (ApplicationException e)
-            {
-                return RedirectToAction(nameof(Error), new { message = e.Message });
-            }
+        public IActionResult Delete(int? id)
+        {
+            if (id == null) return RedirectToAction(nameof(Error), new { message = "Id not provided" });
+
+            var obj = _playerService.FindById(id.Value);
+            if (obj == null) return RedirectToAction(nameof(Error), new { message = "Id not found" });
+
+            return View(obj);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            _playerService.Remove(id);
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Error(string message)

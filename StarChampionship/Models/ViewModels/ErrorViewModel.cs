@@ -1,4 +1,4 @@
-namespace StarChampionship.Models.ViewModels
+namespace PublicTeamManagement.Models.ViewModels
 {
     public class ErrorViewModel
     {

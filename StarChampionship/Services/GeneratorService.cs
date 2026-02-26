@@ -1,9 +1,9 @@
-﻿using StarChampionship.Models;
+﻿using PublicTeamManagement.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace StarChampionship.Services
+namespace PublicTeamManagement.Services
 {
     public class GeneratorService
     {

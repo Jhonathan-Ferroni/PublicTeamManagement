@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace StarChampionship.Models.ViewModels
+namespace PublicTeamManagement.Models.ViewModels
 {
     public class PlayerFormViewModel
     {
