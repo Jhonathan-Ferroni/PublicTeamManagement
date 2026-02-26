@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - StarChampionship</title>
+
+    @* Bootstrap Theme Superhero *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Superhero.min.css" />
+
+    @* Bootstrap Icons CDN *@
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/StarChampionship.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background-color: #0f1923;
+        }
+
+        .navbar {
+            border-bottom: 2px solid #df691a !important;
+            background-color: #2b3e50 !important;
+        }
+
+        .nav-link {
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+            .nav-link:hover {
+                color: #df691a !important;
+            }
+
+        .footer {
+            background-color: #1a242f;
+            color: #ebebeb;
+            border-top: 1px solid rgba(255,255,255,0.1) !important;
+        }
+
+        /* AJUSTE MOBILE DO RODAPÉ */
+        @@media (max-width: 768px) {
+            .footer {
+                padding-top: 0.5rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+
+                .footer .small, .footer a, .footer .badge {
+                    font-size: 0.7rem !important;
+                }
+        }
+    </style>
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom box-shadow mb-4 py-3">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-warning" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-star-fill"></i> StarChampionship
+                </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-lg-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ms-lg-4">
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Generator" asp-action="Index">
+                                <i class="bi bi-cpu"></i> Gerador
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-light" asp-area="" asp-controller="Players" asp-action="Index">
+                                <i class="bi bi-people"></i> Jogadores
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-muted small" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-lock"></i> Privacidade
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-5">
+            @RenderBody()
+        </main>
+    </div>
+
+    @* Reduzi para py-2 para ser mais discreto *@
+    <footer class="footer py-2 mt-auto shadow-lg">
+        <div class="container text-center text-md-start">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-1 mb-md-0">
+                    <span class="small">&copy; 2026 - <span class="text-warning">StarChampionship</span> | Jhonathan Ferroni</span>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="text-muted text-decoration-none small mx-2">Privacidade</a>
+                    <span class="badge bg-secondary opacity-50" style="font-size: 0.65rem;">v3.0.4</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

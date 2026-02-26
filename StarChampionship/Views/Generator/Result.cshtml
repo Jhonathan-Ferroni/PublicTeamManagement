@@ -1,0 +1,360 @@
+﻿@model System.Collections.Generic.IEnumerable<StarChampionship.Models.Player>
+
+@{
+    ViewData["Title"] = "Gerador de Times";
+    var teams = ViewBag.Teams as System.Collections.Generic.List<StarChampionship.Models.Team> ?? new System.Collections.Generic.List<StarChampionship.Models.Team>();
+    var selectedIdsRaw = ViewBag.SelectedIds as int[];
+    var selectedCount = selectedIdsRaw?.Length ?? 0;
+    var numberOfTeams = ViewBag.NumberOfTeams is int n ? n : 2;
+    var margin = ViewBag.Margin is double m ? m : 10.0;
+    var diff = ViewBag.Difference is double d ? d : 0.0;
+}
+
+<div class="container mt-4">
+    @* --- Cabeçalho Responsivo --- *@
+    <div class="row align-items-center border-bottom border-secondary pb-3 mb-4">
+        <div class="col-8">
+            <h2 class="text-white mb-0"><i class="bi bi-cpu text-info"></i> <span class="d-none d-sm-inline">@ViewData["Title"]</span><span class="d-inline d-sm-none">Gerador</span></h2>
+        </div>
+        <div class="col-4 text-end">
+            <button type="submit" form="generator-form" class="btn btn-success shadow-sm btn-sm btn-md-grow">
+                <i class="bi bi-shuffle"></i> <span class="d-none d-md-inline">Gerar Novamente</span><span class="d-inline d-md-none">Sortear</span>
+            </button>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+        </div>
+    }
+
+    @* --- Bloco de Resultados --- *@
+    @if (teams.Any())
+    {
+        <div class="card bg-dark border-success mb-4 shadow">
+            <div class="card-header bg-success bg-opacity-10 d-flex justify-content-between align-items-center border-success">
+                <span class="text-success fw-bold"><i class="bi bi-trophy-fill"></i> Resultado da Geração</span>
+                <span class="badge bg-success">Diferença: @diff.ToString("F1")</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    @foreach (var team in teams)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 bg-secondary bg-opacity-10 border-secondary shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center bg-dark border-secondary">
+                                    <span class="fw-bold text-white">@team.Name</span>
+                                    <span class="badge bg-info text-dark">@team.TotalOverall.ToString("F1")</span>
+                                </div>
+                                <ul class="list-group list-group-flush">
+                                    @foreach (var player in team.Players)
+                                    {
+                                        <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center py-2">
+                                            <div class="d-flex align-items-center">
+                                                <img src="@(string.IsNullOrEmpty(player.ImageUrl) ? "https://cdn-icons-png.flaticon.com/512/166/166344.png" : player.ImageUrl)"
+                                                     class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;" />
+                                                <span class="small">@player.Name</span>
+                                            </div>
+                                            <span class="badge bg-dark text-secondary border border-secondary" style="font-size: 0.7rem;">@player.Overall.ToString("F1")</span>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <form asp-action="Generate" method="post" id="generator-form">
+
+        @* --- Painel de Configurações --- *@
+        <div class="row g-3 mb-4">
+            @* Rigor do Equilíbrio *@
+            <div class="col-md-6">
+                <div class="card bg-dark shadow-sm border-secondary h-100">
+                    <div class="card-body py-3">
+                        <label for="marginRange" class="form-label fw-bold text-white mb-1 small">
+                            <i class="bi bi-sliders text-info"></i> Rigor do Equilíbrio:
+                            <span id="marginValue" class="badge bg-success ms-2">@margin.ToString("F1")</span>
+                            <small id="levelText" class="text-success ms-1" style="font-size: 0.75rem;">(Equilibrado)</small>
+                        </label>
+                        <input type="range" name="margin" class="form-range" min="0" max="50" step="0.5" value="@margin.ToString(System.Globalization.CultureInfo.InvariantCulture)" id="marginRange">
+                        <div class="d-flex justify-content-between">
+                            <small class="text-muted" style="font-size: 0.65rem;">0.0 (Pro)</small>
+                            <small class="text-muted" style="font-size: 0.65rem;">50.0 (Várzea)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Quantidade de Times e Capitães *@
+            <div class="col-md-6">
+                <div class="card bg-dark shadow-sm border-secondary h-100">
+                    <div class="card-body py-3">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-white small"><i class="bi bi-people text-info"></i> Times:</label>
+                                <input type="number" name="numberOfTeams" id="numberOfTeams" class="form-control form-control-sm bg-dark text-white border-secondary" min="2" max="10" value="@numberOfTeams">
+                            </div>
+                            <div class="col-6 d-flex align-items-end">
+                                <div class="form-check form-switch mb-1">
+                                    <input class="form-check-input" type="checkbox" name="hasFixedCaptains" id="hasFixedCaptains" value="true">
+                                    <label class="form-check-label text-white small" for="hasFixedCaptains">Fixar Capitães</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* --- Seção Dinâmica de Capitães --- *@
+        <div id="captains-section" class="card bg-dark border-info mb-4 d-none">
+            <div class="card-header py-2 bg-info bg-opacity-10 text-info small fw-bold">
+                <i class="bi bi-star-fill"></i> Designar Capitães
+            </div>
+            <div class="card-body py-3">
+                <div id="captains-container" class="row g-2"></div>
+            </div>
+        </div>
+
+        @* --- Lista de Atletas --- *@
+        <div class="card shadow-sm border-secondary">
+            <div class="card-header bg-primary py-2 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-white">Atletas Escolhidos</h6>
+                <span id="selected-count" class="badge bg-warning text-dark fw-bold">@selectedCount selecionados</span>
+            </div>
+
+            <div class="card-body p-0 bg-dark">
+                @* VISÃO DESKTOP *@
+                <div class="table-responsive d-none d-md-block">
+                    <table class="table table-dark table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                        <thead>
+                            <tr class="table-active">
+                                <th style="width: 50px;" class="text-center">
+                                    <input type="checkbox" id="selectAllDesktop" class="form-check-input select-all-btn" />
+                                </th>
+                                <th style="width: 60px;">Foto</th>
+                                <th>Nome</th>
+                                <th class="text-center" style="width: 100px;">Overall</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                bool isSelected = selectedIdsRaw != null && Array.IndexOf(selectedIdsRaw, item.Id) >= 0;
+                                <tr>
+                                    <td class="text-center">
+                                        <input type="checkbox" name="selectedIds" value="@item.Id" data-name="@item.Name"
+                                               class="form-check-input player-checkbox" @(isSelected ? "checked" : "") />
+                                    </td>
+                                    <td>
+                                        <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://cdn-icons-png.flaticon.com/512/166/166344.png" : item.ImageUrl)"
+                                             class="rounded-circle border border-secondary" style="width: 35px; height: 35px; object-fit: cover;" />
+                                    </td>
+                                    <td class="text-white fw-bold">@item.Name</td>
+                                    <td class="text-center">
+                                        <span class="badge @(item.Overall >= 80 ? "bg-success" : "bg-info") text-dark fw-bold">@item.Overall.ToString("F1")</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @* VISÃO MOBILE *@
+                <div class="d-md-none p-2">
+                    <div class="d-flex justify-content-between align-items-center mb-3 px-2 border-bottom border-secondary pb-2">
+                        <label for="selectAllMobile" class="text-muted fw-bold mb-0" style="font-size: 0.75rem;">
+                            <i class="bi bi-check2-all text-info"></i> SELECIONAR TODOS
+                        </label>
+                        <input type="checkbox" id="selectAllMobile" class="form-check-input select-all-btn border-light" />
+                    </div>
+
+                    @foreach (var item in Model)
+                    {
+                        bool isSelected = selectedIdsRaw != null && Array.IndexOf(selectedIdsRaw, item.Id) >= 0;
+                        <div class="player-card-mobile bg-secondary bg-opacity-10 border border-secondary rounded p-2 mb-2 shadow-sm" style="cursor: pointer;">
+                            <div class="row align-items-center g-0">
+                                <div class="col-2 text-center">
+                                    <input type="checkbox" name="selectedIds" value="@item.Id" data-name="@item.Name"
+                                           class="form-check-input player-checkbox" @(isSelected ? "checked" : "")>
+                                </div>
+                                <div class="col-2 text-center">
+                                    <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "https://cdn-icons-png.flaticon.com/512/166/166344.png" : item.ImageUrl)"
+                                         class="rounded-circle" style="width: 35px; height: 35px; object-fit: cover;" />
+                                </div>
+                                <div class="col-6 ps-2">
+                                    <div class="text-white fw-bold small">@item.Name</div>
+                                </div>
+                                <div class="col-2 text-end">
+                                    <span class="badge @(item.Overall >= 80 ? "bg-success" : "bg-info") text-dark fw-bold" style="font-size: 0.75rem;">@item.Overall.ToString("F1")</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        const marginRange = document.getElementById('marginRange');
+        const marginValue = document.getElementById('marginValue');
+        const numTeamsInput = document.getElementById('numberOfTeams');
+        const captainsSwitch = document.getElementById('hasFixedCaptains');
+        const captainsSection = document.getElementById('captains-section');
+        const captainsContainer = document.getElementById('captains-container');
+        const checkboxes = document.querySelectorAll('.player-checkbox');
+        const countBadge = document.getElementById('selected-count');
+        const levelText = document.getElementById('levelText');
+
+        // Inicializar UI do Slider no carregamento
+        function updateSliderUI(val) {
+            marginValue.innerText = val.toFixed(1);
+            marginValue.classList.remove('bg-success', 'bg-warning', 'bg-danger');
+            levelText.classList.remove('text-success', 'text-warning', 'text-danger');
+
+            if (val <= 10.0) {
+                marginValue.classList.add('bg-success');
+                levelText.classList.add('text-success');
+                levelText.innerText = '(Equilibrado)';
+            } else if (val <= 25.0) {
+                marginValue.classList.add('bg-warning', 'text-dark');
+                levelText.classList.add('text-warning');
+                levelText.innerText = '(Pequena Diferença)';
+            } else {
+                marginValue.classList.add('bg-danger');
+                levelText.classList.add('text-danger');
+                levelText.innerText = '(Desnível Técnico)';
+            }
+        }
+
+        marginRange.addEventListener('input', function() {
+            updateSliderUI(parseFloat(this.value));
+        });
+
+        // Chamada inicial para definir cores corretas baseadas no valor que veio da Controller
+        updateSliderUI(parseFloat(marginRange.value));
+
+        function updateCaptainsUI() {
+            const numTeams = parseInt(numTeamsInput.value);
+            const showCaptains = captainsSwitch.checked;
+
+            if (showCaptains) {
+                captainsSection.classList.remove('d-none');
+                captainsContainer.innerHTML = '';
+                const selectedPlayersMap = new Map();
+                document.querySelectorAll('.player-checkbox:checked').forEach(cb => {
+                    selectedPlayersMap.set(cb.value, cb.getAttribute('data-name'));
+                });
+
+                for (let i = 1; i <= numTeams; i++) {
+                    let options = '<option value="0">-- Sem Capitão --</option>';
+                    selectedPlayersMap.forEach((name, id) => {
+                        options += `<option value="${id}">${name}</option>`;
+                    });
+
+                    captainsContainer.innerHTML += `
+                        <div class="col-md-4 col-6 mb-2">
+                            <label class="text-muted small">Time ${i}</label>
+                            <select name="selectedCaptains[${i}]" class="form-select form-select-sm bg-dark text-white border-secondary">
+                                ${options}
+                            </select>
+                        </div>`;
+                }
+            } else {
+                captainsSection.classList.add('d-none');
+            }
+        }
+
+        numTeamsInput.addEventListener('change', updateCaptainsUI);
+        captainsSwitch.addEventListener('change', updateCaptainsUI);
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                document.querySelectorAll(`.player-checkbox[value="${cb.value}"]`).forEach(c => c.checked = cb.checked);
+                const uniqueSelected = new Set([...document.querySelectorAll('.player-checkbox:checked')].map(c => c.value)).size;
+                countBadge.innerText = `${uniqueSelected} selecionados`;
+                updateCaptainsUI();
+            });
+        });
+
+        document.querySelectorAll('.select-all-btn').forEach(btn => {
+            btn.addEventListener('change', function() {
+                checkboxes.forEach(cb => cb.checked = this.checked);
+                const uniqueSelected = new Set([...document.querySelectorAll('.player-checkbox:checked')].map(c => c.value)).size;
+                countBadge.innerText = `${uniqueSelected} selecionados`;
+                updateCaptainsUI();
+            });
+        });
+
+        document.querySelectorAll('.player-card-mobile').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.type !== 'checkbox') {
+                    const cb = card.querySelector('.player-checkbox');
+                    cb.checked = !cb.checked;
+                    cb.dispatchEvent(new Event('change'));
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Reaproveitando os mesmos estilos do Index para consistência visual */
+    .player-card-mobile {
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+        .player-card-mobile:active {
+            transform: scale(0.98);
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+
+    .form-range::-webkit-slider-thumb {
+        background: #0dcaf0;
+    }
+
+    .table-dark {
+        --bs-table-bg: #1a1d20;
+        --bs-table-border-color: #373b3e;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    #captains-section {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .btn-md-grow {
+            width: 100%;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+        }
+    }
+</style>

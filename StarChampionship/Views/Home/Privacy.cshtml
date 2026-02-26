@@ -1,0 +1,70 @@
+﻿@{
+    ViewData["Title"] = "Política de Privacidade";
+}
+
+<div class="container mt-4 mt-md-5">
+    @* Cabeçalho da Página *@
+    <div class="border-bottom border-secondary pb-3 mb-4">
+        <h1 class="text-white"><i class="bi bi-shield-lock text-info"></i> @ViewData["Title"]</h1>
+        <p class="text-muted">Última atualização: 21 de Fevereiro de 2026</p>
+    </div>
+
+    @* Conteúdo da Política *@
+    <div class="card bg-dark text-white border-secondary shadow-sm">
+        <div class="card-body p-4 p-md-5">
+
+            <section class="mb-5">
+                <h3 class="text-info"><i class="bi bi-person-check small"></i> 1. Coleta de Dados</h3>
+                <p class="opacity-75">
+                    O **StarChampionship** coleta informações básicas dos atletas, como nome, fotos e atributos técnicos (overall, velocidade, passe, etc.), com o único propósito de realizar o balanceamento das equipes.
+                </p>
+            </section>
+
+            <section class="mb-5">
+                <h3 class="text-info"><i class="bi bi-cpu small"></i> 2. Uso das Informações</h3>
+                <p class="opacity-75">
+                    Os dados técnicos são processados pelo nosso algoritmo de otimização para garantir que as partidas sejam competitivas e equilibradas. Não compartilhamos esses dados com terceiros.
+                </p>
+            </section>
+
+            <section class="mb-5">
+                <h3 class="text-info"><i class="bi bi-cloud-arrow-up small"></i> 3. Armazenamento e Segurança</h3>
+                <p class="opacity-75">
+                    Utilizamos infraestrutura segura (Render) para hospedar sua aplicação. Fotos de perfil enviadas são armazenadas via URL externa ou localmente, conforme configurado no sistema.
+                </p>
+            </section>
+
+            <section>
+                <h3 class="text-info"><i class="bi bi-envelope-at small"></i> 4. Contato</h3>
+                <p class="opacity-75">
+                    Se você tiver dúvidas sobre como seus dados são tratados no projeto, entre em contato com o administrador do sistema.
+                </p>
+            </section>
+
+        </div>
+    </div>
+
+    @* Botão de Voltar *@
+    <div class="mt-4 text-center text-md-start pb-5">
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary px-4">
+            <i class="bi bi-arrow-left"></i> Voltar para Home
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Estilo para manter a legibilidade em telas menores */
+    @@media (max-width: 768px) {
+        h3 {
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 1.5rem !important;
+        }
+    }
+
+    .bg-dark {
+        background-color: #1a1d20 !important;
+    }
+</style>

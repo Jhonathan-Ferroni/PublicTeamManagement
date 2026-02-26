@@ -1,0 +1,139 @@
+﻿@model StarChampionship.Models.Player
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Novo Craque";
+}
+
+<div class="container mt-4 pb-5">
+    @* Cabeçalho *@
+    <div class="border-bottom border-secondary pb-2 mb-4">
+        <h2 class="text-white"><i class="bi bi-person-plus text-info"></i> @ViewData["Title"]</h2>
+        <h6 class="text-muted text-uppercase small">Ficha Técnica do Atleta</h6>
+    </div>
+
+    <div class="row g-4">
+        @* Coluna do Formulário *@
+        <div class="col-lg-8">
+            <div class="card bg-dark text-white border-secondary shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        @* Dados Básicos *@
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Name" class="form-label fw-bold small text-info">Nome do Craque</label>
+                                    <input asp-for="Name" class="form-control bg-dark border-secondary text-white" placeholder="Ex: Jhonathan" />
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ImageUrl" class="form-label fw-bold small text-info">Imagem (URL)</label>
+                                    <input asp-for="ImageUrl" class="form-control bg-dark border-secondary text-white" placeholder="https://link-da-foto.jpg" />
+                                    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 border-secondary">
+                        <h5 class="mb-3 text-info"><i class="bi bi-bar-chart"></i> Atributos Técnicos</h5>
+
+                        @* Linha 1 de Atributos *@
+                        <div class="row g-3 mb-3">
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Shoot" class="form-label small text-muted">Chute</label>
+                                <input asp-for="Shoot" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="Shoot" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Dribble" class="form-label small text-muted">Drible</label>
+                                <input asp-for="Dribble" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="Dribble" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="FirstTouch" class="form-label small text-muted">Domínio</label>
+                                <input asp-for="FirstTouch" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="FirstTouch" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="BallControl" class="form-label small text-muted">Controle</label>
+                                <input asp-for="BallControl" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="BallControl" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        @* Linha 2 de Atributos *@
+                        <div class="row g-3 mb-4">
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Defense" class="form-label small text-muted">Defesa</label>
+                                <input asp-for="Defense" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="Defense" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Pass" class="form-label small text-muted">Passe</label>
+                                <input asp-for="Pass" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="Pass" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Speed" class="form-label small text-muted">Velocidade</label>
+                                <input asp-for="Speed" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="Speed" class="text-danger small"></span>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Strength" class="form-label small text-muted">Força</label>
+                                <input asp-for="Strength" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                                <span asp-validation-for="Strength" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
+                                <i class="bi bi-save"></i> Salvar Jogador
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @* Coluna de Preview Lateral *@
+        <div class="col-lg-4">
+            <div class="card bg-dark text-white border-info border-opacity-25 shadow-sm p-4 text-center">
+                <h5 class="text-info mb-3">Dica de Overall</h5>
+                <p class="small text-muted mb-4">O cálculo do **Overall** é processado no servidor para garantir a precisão do algoritmo de sorteio.</p>
+                <div class="py-4 rounded bg-secondary bg-opacity-10 border border-secondary border-dashed">
+                    <i class="bi bi-person-badge display-1 text-secondary opacity-50"></i>
+                    <p class="mt-2 text-muted italic">Preview indisponível antes do cadastro</p>
+                </div>
+                <div class="mt-4 alert alert-info py-2 small border-0 bg-opacity-10">
+                    <i class="bi bi-info-circle"></i> Use notas de 0 a 100 para melhor precisão.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<style>
+    /* Estilo para garantir que os campos fiquem bons no mobile */
+    .form-control:focus {
+        background-color: #212529;
+        color: white;
+        border-color: #0dcaf0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25);
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+</style>

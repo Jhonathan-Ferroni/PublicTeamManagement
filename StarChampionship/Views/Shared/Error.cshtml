@@ -1,0 +1,79 @@
+﻿@using StarChampionship.Models.ViewModels
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Ocorreu um Impedimento";
+}
+
+<div class="container mt-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card bg-dark border-danger shadow-lg text-center">
+                @* Ícone de Alerta Animado *@
+                <div class="card-header bg-danger bg-gradient py-4">
+                    <i class="bi bi-exclamation-octagon display-1 text-white animate-pulse"></i>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="text-danger fw-bold mb-3">Erro no Campo!</h1>
+                    <h4 class="text-white mb-4">@Model.Message</h4>
+
+                    <p class="text-muted small">
+                        O sistema encontrou uma falha inesperada durante o processamento.
+                        Isso pode ser um problema temporário de conexão ou um erro nos dados enviados.
+                    </p>
+
+                    @if (Model.ShowRequestId)
+                    {
+                        <div class="alert alert-secondary bg-dark border-secondary mt-4 py-2">
+                            <small class="text-muted d-block uppercase fw-bold" style="font-size: 0.65rem;">ID da Requisição para o Suporte</small>
+                            <code class="text-info">@Model.RequestId</code>
+                        </div>
+                    }
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-5">
+                        <a href="javascript:history.back()" class="btn btn-outline-light px-4">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-danger px-4 shadow">
+                            <i class="bi bi-house"></i> Ir para a Home
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-dark border-top border-secondary text-muted small py-3">
+                    <i class="bi bi-shield-fill-exclamation text-warning"></i> StarChampionship - Sistema de Monitoramento
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Pulsação suave para o ícone de erro */
+    .animate-pulse {
+        animation: pulse-red 2s infinite;
+    }
+
+    @@keyframes pulse-red {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        50% {
+            transform: scale(1.05);
+            opacity: 0.8;
+        }
+
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* Ajuste para o código de erro não quebrar no mobile */
+    code {
+        word-break: break-all;
+        font-size: 0.85rem;
+    }
+</style>

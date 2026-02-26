@@ -1,0 +1,130 @@
+﻿@model StarChampionship.Models.Player
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Editar Jogador";
+}
+
+<div class="container mt-4 pb-5">
+    @* Cabeçalho Responsivo *@
+    <div class="border-bottom border-secondary pb-2 mb-4">
+        <h2 class="text-white"><i class="bi bi-pencil-square text-info"></i> @ViewData["Title"]</h2>
+        <h6 class="text-muted text-uppercase small">Atualizando ficha de @Model.Name</h6>
+    </div>
+
+    <div class="row g-4">
+        @* Coluna do Formulário *@
+        <div class="col-lg-8">
+            <div class="card bg-dark text-white border-secondary shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="Edit" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        @* Dados Básicos *@
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Name" class="form-label fw-bold small text-info">Nome do Jogador</label>
+                                    <input asp-for="Name" class="form-control bg-dark border-secondary text-white" />
+                                    <span asp-validation-for="Name" class="text-danger small"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="ImageUrl" class="form-label fw-bold small text-info">URL da Imagem</label>
+                                    <input asp-for="ImageUrl" class="form-control bg-dark border-secondary text-white" placeholder="http://link-da-foto.jpg" />
+                                    <span asp-validation-for="ImageUrl" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 border-secondary">
+                        <h5 class="mb-3 text-info"><i class="bi bi-bar-chart-steps"></i> Atributos Técnicos</h5>
+
+                        @* Grid de Atributos Responsivo *@
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Shoot" class="form-label small text-muted">Chute</label>
+                                <input asp-for="Shoot" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="Dribble" class="form-label small text-muted">Drible</label>
+                                <input asp-for="Dribble" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="FirstTouch" class="form-label small text-muted">Domínio</label>
+                                <input asp-for="FirstTouch" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <label asp-for="BallControl" class="form-label small text-muted">Controle</label>
+                                <input asp-for="BallControl" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+
+                            <div class="col-6 col-md-3 mt-md-3">
+                                <label asp-for="Defense" class="form-label small text-muted">Defesa</label>
+                                <input asp-for="Defense" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                            <div class="col-6 col-md-3 mt-md-3">
+                                <label asp-for="Pass" class="form-label small text-muted">Passe</label>
+                                <input asp-for="Pass" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                            <div class="col-6 col-md-3 mt-md-3">
+                                <label asp-for="Speed" class="form-label small text-muted">Velocidade</label>
+                                <input asp-for="Speed" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                            <div class="col-6 col-md-3 mt-md-3">
+                                <label asp-for="Strength" class="form-label small text-muted">Força</label>
+                                <input asp-for="Strength" type="number" class="form-control bg-dark border-secondary text-white text-center" />
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex mt-5">
+                            <button type="submit" class="btn btn-success btn-lg px-5 shadow">
+                                <i class="bi bi-check-circle"></i> Salvar Alterações
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        @* Preview Lateral *@
+        <div class="col-lg-4 text-center">
+            <div class="card bg-dark text-white border-secondary shadow-sm p-4">
+                <h6 class="text-muted text-uppercase small mb-4">Preview Atual</h6>
+
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" class="img-thumbnail bg-transparent border-info border-2 mx-auto mb-3"
+                         style="width: 160px; height: 160px; object-fit: cover; border-radius: 50%;" />
+                }
+                else
+                {
+                    <div class="bg-secondary bg-opacity-10 text-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width: 160px; height: 160px; border-radius: 50%; border: 2px dashed #6c757d;">
+                        <i class="bi bi-person-slash display-4"></i>
+                    </div>
+                }
+
+                <div class="mt-2">
+                    <p class="mb-0 text-muted small">Overall Atual</p>
+                    <h2 class="display-4 fw-bold text-success">@Model.Overall.ToString("F0")</h2>
+                </div>
+
+                <div class="alert alert-info bg-dark border-info border-opacity-25 text-info small mt-4 py-2">
+                    <i class="bi bi-info-circle"></i> O overall é recalculado automaticamente após salvar.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-4 mt-md-5">
+    @* Jumbotron Responsivo *@
+    <div class="p-4 p-md-5 mb-4 bg-dark text-white rounded-3 shadow border border-secondary">
+        <div class="container-fluid py-2 py-md-5 text-center">
+            <h1 class="display-5 display-md-4 fw-bold">Star Championship</h1>
+            <p class="fs-5 fs-md-4 opacity-75">O sistema definitivo para balanceamento de times.</p>
+            <hr class="my-3 my-md-4" style="border-top: 1px solid rgba(255,255,255,0.2)">
+            <p class="small text-info d-md-none"><i class="bi bi-phone"></i> Otimizado para Mobile</p>
+        </div>
+    </div>
+
+    @* Grid de Funcionalidades *@
+    <div class="row g-4 py-2">
+        @* Card Jogadores *@
+        <div class="col-12 col-md-6 col-lg-6">
+            <div class="card h-100 shadow-sm border-0 bg-dark text-white border-bottom border-primary border-3">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 mb-3 p-3 rounded-circle shadow">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold">Atletas</h3>
+                    <p class="text-muted small">Gerencie seu elenco, edite fotos e ajuste atributos técnicos como Shoot, Defense e Speed.</p>
+                    <div class="d-grid mt-auto">
+                        <a asp-controller="Players" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="bi bi-search"></i> Explorar Elenco
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Card Gerador *@
+        <div class="col-12 col-md-6 col-lg-6">
+            <div class="card h-100 shadow border-success bg-dark text-white border-3">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon d-inline-flex align-items-center justify-content-center text-bg-success bg-gradient fs-2 mb-3 p-3 rounded-circle shadow">
+                        <i class="bi bi-shuffle"></i>
+                    </div>
+                    <h3 class="fs-4 fw-bold text-success">Gerador de Partida</h3>
+                    <p class="text-muted small">Algoritmo de otimização para sorteios equilibrados baseados em performance real.</p>
+                    <div class="d-grid mt-auto">
+                        <a asp-controller="Generator" asp-action="Index" class="btn btn-success btn-lg shadow-lg fw-bold">
+                            <i class="bi bi-play-fill"></i> Iniciar Sorteio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Banner de Informação Responsivo *@
+    <div class="mt-5 p-3 p-md-4 border-0 rounded-3 bg-info bg-gradient shadow-sm">
+        <div class="row align-items-center text-center text-md-start">
+            <div class="col-md-9">
+                <h5 class="fw-bold"><i class="bi bi-lightbulb text-warning"></i> Dica de Ouro</h5>
+                <p class="mb-0 text-dark opacity-75 small">
+                    Mantenha as notas de 0 a 100 atualizadas no seu projeto **StarChampionship**.
+                    O sistema utiliza esses dados para garantir que ninguém fique em um time "apelão"!
+                </p>
+            </div>
+            <div class="col-md-3 text-md-end mt-3 mt-md-0">
+                <span class="badge bg-dark text-info px-3 py-2">v3.0 - Paid Tier</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Efeito de hover nos cards para desktop */
+    @@media (min-width: 768px) {
+        .card {
+            transition: transform 0.3s ease;
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+    }
+    /* Ajuste para botões ocuparem toda a largura no mobile */
+    .btn-md-grow {
+        width: auto;
+    }
+
+    @@media (max-width: 576px) {
+        .btn-md-grow {
+            width: 100%;
+        }
+    }
+</style>
