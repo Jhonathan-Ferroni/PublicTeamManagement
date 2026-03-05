@@ -1,8 +1,7 @@
-# ⭐ Star Championship
-
+# ⭐ Public Team Management
 Aplicação web em **ASP.NET Core MVC** para cadastro de atletas e geração automática de times equilibrados com base em atributos técnicos.
 
-O projeto foi construído em **.NET / C#**, com interface server-side em **Razor (HTML)** e **Bootstrap**, persistência em **MySQL** via **Entity Framework Core + Pomelo**, containerização com **Docker** e preparo para deploy em **Render** conectado a banco **Aiven**.
+O projeto foi construído em **.NET / C#**, com interface server-side em **Razor (HTML)** e **Bootstrap** e persistência baseada em arquivos **.csv**.
 
 ---
 
@@ -15,10 +14,6 @@ O projeto foi construído em **.NET / C#**, com interface server-side em **Razor
 - [Modelo de dados](#-modelo-de-dados)
 - [Interface e experiência visual](#-interface-e-experiência-visual)
 - [Execução local (sem Docker)](#-execução-local-sem-docker)
-- [Execução com Docker](#-execução-com-docker)
-- [Banco de dados MySQL (Aiven)](#-banco-de-dados-mysql-aiven)
-- [Deploy no Render](#-deploy-no-render)
-- [Migrations e manutenção do banco](#-migrations-e-manutenção-do-banco)
 - [Estrutura de pastas](#-estrutura-de-pastas)
 
 ---
@@ -80,21 +75,13 @@ Na tela de resultado, é possível “re-sortear” com nova margem sem precisar
 - **Dependency Injection** nativa do ASP.NET
 
 ### Dados
-- **Entity Framework Core 9**
-- **Pomelo.EntityFrameworkCore.MySql**
-- **MySqlConnector**
-- **MySQL**
+- **.csv**
 
 ### Front-end
 - **HTML (Razor .cshtml)**
 - **Bootstrap** (tema custom + responsividade)
 - **Bootstrap Icons**
 - **jQuery** e validação unobtrusive
-
-### Infra e deploy
-- **Docker** (build/publish multi-stage)
-- **Render** (hospedagem da aplicação web)
-- **Aiven** (MySQL gerenciado na nuvem)
 
 ---
 
@@ -105,7 +92,6 @@ A solução segue o padrão **MVC**:
 - `Models/` → entidades e validações.
 - `Views/` → páginas Razor renderizadas no servidor.
 - `Services/` → regras de negócio e acesso organizado ao contexto.
-- `Data/` → `DbContext` e seeding.
 
 ---
 
@@ -123,8 +109,7 @@ Campos principais:
 
 ### Pré-requisitos
 - .NET SDK 8+
-- MySQL disponível (local ou remoto)
-
+  
 ### 1) Clonar
 ```bash
 git clone <url-do-repositorio>
@@ -153,9 +138,6 @@ dotnet run --project StarChampionship/StarChampionship.csproj
 
 ---
 
-## 🐳 Execução com Docker
-
-O repositório já inclui `Dockerfile` multi-stage.
 
 ### Build da imagem
 
@@ -177,18 +159,6 @@ A aplicação ficará disponível em `http://localhost:10000`.
 
 ---
 
-## 🧪 Migrations e manutenção do banco
-
-```bash
-# Atualizar banco
-dotnet ef database update --project StarChampionship/StarChampionship.csproj
-
-# Criar nova migration
-dotnet ef migrations add NomeDaMigration --project StarChampionship/StarChampionship.csproj
-
-```
-
----
 
 ## 📁 Estrutura de pastas
 
@@ -196,17 +166,15 @@ dotnet ef migrations add NomeDaMigration --project StarChampionship/StarChampion
 .
 ├── Dockerfile
 ├── README.md
-└── StarChampionship/
+└── PublicTeamManagement/
     ├── Controllers/
-    ├── Data/
-    ├── Migrations/
     ├── Models/
     ├── Services/
     ├── Views/
     ├── wwwroot/
     ├── Program.cs
     ├── appsettings.json
-    └── StarChampionship.csproj
+    └── PublicTeamManagement.csproj
 
 ```
 
@@ -215,7 +183,7 @@ dotnet ef migrations add NomeDaMigration --project StarChampionship/StarChampion
 
 ## 👨‍💻 Autor
 
-Projeto **Star Championship**, desenvolvido com foco em organização de times equilibrados e experiência web moderna com .NET + C#.
+Projeto **Public Team Management**, desenvolvido com foco em organização de times equilibrados e experiência web moderna com .NET + C#.
 
 ```
 Jhonathan Ferroni.
