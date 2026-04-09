@@ -4,17 +4,17 @@ WORKDIR /src
 
 # 1. Copia apenas o arquivo de projeto primeiro (melhora o cache do Docker)
 # Como seu projeto está dentro da pasta StarChampionship, o caminho é esse:
-COPY StarChampionship/StarChampionship.csproj StarChampionship/
+COPY StarChampionship/PublicTeamManagement.csproj PublicTeamManagement/
 
 # 2. Executa o restore diretamente no arquivo de projeto
-RUN dotnet restore StarChampionship/StarChampionship.csproj
+RUN dotnet restore PublicTeamManagement/PublicTeamManagement.csproj
 
 # 3. Agora copia todo o resto dos arquivos
 COPY . .
 
 # 4. Entra na pasta do projeto para buildar e publicar
-WORKDIR "/src/StarChampionship"
-RUN dotnet publish "StarChampionship.csproj" -c Release -o /app/publish /p:UseAppHost=false
+WORKDIR "/src/PublicTeamManagement"
+RUN dotnet publish "PublicTeamManagement.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
@@ -25,4 +25,4 @@ COPY --from=build /app/publish .
 ENV ASPNETCORE_URLS=http://+:10000
 EXPOSE 10000
 
-ENTRYPOINT ["dotnet", "StarChampionship.dll"]
+ENTRYPOINT ["dotnet", "PublicTeamManagement.dll"]
