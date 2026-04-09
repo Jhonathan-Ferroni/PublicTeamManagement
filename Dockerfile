@@ -4,7 +4,7 @@ WORKDIR /src
 
 # 1. Copia apenas o arquivo de projeto primeiro (melhora o cache do Docker)
 # Como seu projeto está dentro da pasta StarChampionship, o caminho é esse:
-COPY StarChampionship/PublicTeamManagement.csproj PublicTeamManagement/
+COPY PublicTeamManagement/PublicTeamManagement.csproj PublicTeamManagement/
 
 # 2. Executa o restore diretamente no arquivo de projeto
 RUN dotnet restore PublicTeamManagement/PublicTeamManagement.csproj
