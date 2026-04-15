@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using CsvHelper;
+using Microsoft.AspNetCore.Http;
 using PublicTeamManagement.Models;
 
 namespace PublicTeamManagement.Services
@@ -7,15 +8,41 @@ namespace PublicTeamManagement.Services
     public class PlayerService
     {
         private readonly string _filePath;
+        private readonly object _fileLock = new();
 
-        public PlayerService(IWebHostEnvironment env)
+        public PlayerService(IWebHostEnvironment env, IHttpContextAccessor httpContextAccessor)
         {
-            // Define o caminho na pasta wwwroot/data/players.csv
-            _filePath = Path.Combine(env.WebRootPath, "data", "players.csv");
+            // Gerar/obter um identificador por usuário (armazenado em cookie).
+            // Esse id será usado para um arquivo CSV separado por usuário.
+            var httpContext = httpContextAccessor.HttpContext;
+            string userId = "default";
 
-            // Cria a pasta e o arquivo caso não existam
-            var directory = Path.GetDirectoryName(_filePath);
-            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory!);
+            try
+            {
+                if (httpContext != null)
+                {
+                    var request = httpContext.Request;
+                    var response = httpContext.Response;
+
+                    if (!request.Cookies.TryGetValue("PTM_UserId", out userId) || string.IsNullOrWhiteSpace(userId))
+                    {
+                        userId = Guid.NewGuid().ToString("N");
+                        // Cookie durará 1 ano
+                        response.Cookies.Append("PTM_UserId", userId, new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true });
+                    }
+                }
+            }
+            catch
+            {
+                // Em alguns cenários (ex: execução em background) HttpContext pode ser nulo
+                userId = "default";
+            }
+
+            // Usar ContentRootPath para não expor os CSVs via static files
+            var dataDir = Path.Combine(env.ContentRootPath, "data");
+            if (!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
+
+            _filePath = Path.Combine(dataDir, $"players_{userId}.csv");
 
             // Se o arquivo não existir, cria um vazio com o cabeçalho para evitar erros de leitura
             if (!File.Exists(_filePath))
@@ -31,16 +58,29 @@ namespace PublicTeamManagement.Services
         {
             if (!File.Exists(_filePath)) return new List<Player>();
 
-            using var reader = new StreamReader(_filePath);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            return csv.GetRecords<Player>().ToList();
+            lock (_fileLock)
+            {
+                using var reader = new StreamReader(_filePath);
+                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                return csv.GetRecords<Player>().ToList();
+            }
         }
 
         public void SaveAll(List<Player> players)
         {
-            using var writer = new StreamWriter(_filePath);
-            using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-            csv.WriteRecords(players);
+            lock (_fileLock)
+            {
+                var temp = _filePath + ".tmp";
+                using (var writer = new StreamWriter(temp, false))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv.WriteRecords(players);
+                    writer.Flush();
+                }
+
+                // Substituição atômica do arquivo
+                File.Move(temp, _filePath, true);
+            }
         }
 
         public void AddPlayer(Player player)

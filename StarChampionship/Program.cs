@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Adicionamos os serviços necessários para a lógica de CSV e geração de times
 builder.Services.AddScoped<PlayerService>();
 builder.Services.AddScoped<GeneratorService>();
+// Permite que services peçam HttpContext (usado para identificar usuário por cookie)
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllersWithViews();
 
